@@ -7,6 +7,7 @@ let redisClient = redis.createClient()
 
 const app = express()
 
+app.set('trust proxy', 1)
 app.use(
   session({
     store: new RedisStore({ client: redisClient }),
