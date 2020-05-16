@@ -11,14 +11,6 @@
     "generate": "nuxt generate",
     "test": "jest"
   },
-  "lint-staged": {
-    "*.{js,vue}": "yarn lint"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
   "dependencies": {
     "@nuxtjs/axios": "^5.3.6",
     "@nuxtjs/dotenv": "^1.4.0",
