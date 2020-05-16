@@ -7,6 +7,15 @@ let redisClient = redis.createClient()
 
 const app = express()
 
+app.use(
+  session({
+    store: new RedisStore({ client: redisClient }),
+    resave: false,
+    saveUninitialized: false,
+    secret: process.env.SECRET,
+    cookie: { path: '/', httpOnly: true, secure: process.env.SECURE == 'true', maxAge: 31556952000 }
+  })
+)
 // Create express router
 const router = express.Router()
 
