@@ -66,7 +66,7 @@ export default {
   beforeMount () {
     const tempPlayers = []
 
-    axios.get("https://10man.horizonservers.net/api/overview").then(res => {
+    axios.get(process.env.API_ENDPOINT+"overview").then(res => {
       const ids = []
 
       for (let i = 0; i < res.data.length; i++) {
@@ -75,11 +75,11 @@ export default {
         data.steamid = this.to64(data.steam)
         ids.push(data.steamid)
 
-        this.promises.push(axios.get("https://10mandemos.horizonservers.net/api/player/"+data.steamid+"/stats"))
+        this.promises.push(axios.get(process.env.API_DEMOS_ENDPOINT+"player/"+data.steamid+"/stats"))
         tempPlayers.push(data)
       }
 
-      this.promises.push(axios.get("https://10mandemos.horizonservers.net/api/steamids/info?steamids="+ids.join(',')))
+      this.promises.push(axios.get(process.env.API_DEMOS_ENDPOINT+"steamids/info?steamids="+ids.join(',')))
 
       Promise.all(this.promises).then(results => {
         results.forEach(res => {

@@ -246,13 +246,13 @@ export default {
       }
     },
     downloadDemo (demoid) {
-      window.location.href = 'https://10mandemos.horizonservers.net/demo_download/' + demoid
+      window.location.href = process.env.DEMOS_DL_ENDPOINT + demoid
     },
     getData () {
       let steamIDs = []
       let promises = []
 
-      axios.get("https://10mandemos.horizonservers.net/api/player/"+this.$route.params.id+"/stats").then(res => {
+      axios.get(process.env.API_DEMOS_ENDPOINT+"player/"+this.$route.params.id+"/stats").then(res => {
         this.stats = res.data
         this.statItems = [
           {
@@ -286,11 +286,11 @@ export default {
         ]
       })
 
-      axios.get("https://10mandemos.horizonservers.net/api/player/"+this.$route.params.id+"/demos?offset=0").then(res => {
+      axios.get(process.env.API_DEMOS_ENDPOINT+"player/"+this.$route.params.id+"/demos?offset=0").then(res => {
         this.demos = res.data.demos
 
         for (let i = 0; i < this.demos.length; i++) {
-          promises.push(axios.get("https://10mandemos.horizonservers.net/api/demo/"+this.demos[i].demoid+"/stats"))
+          promises.push(axios.get(process.env.API_DEMOS_ENDPOINT+"demo/"+this.demos[i].demoid+"/stats"))
         }
 
         Promise.all(promises).then(results => {
@@ -329,7 +329,7 @@ export default {
             }
           }
 
-          axios.get("https://10mandemos.horizonservers.net/api/steamids/info?steamids="+distinctSteamIDs.join(',')).then(res => {
+          axios.get(process.env.API_DEMOS_ENDPOINT+"steamids/info?steamids="+distinctSteamIDs.join(',')).then(res => {
             for (const steamid in res.data) {
               this.profiles[steamid] = res.data[steamid]
             }
@@ -339,7 +339,7 @@ export default {
         })
       })
 
-      axios.get("https://10mandemos.horizonservers.net/api/steamids/info?steamids="+this.$route.params.id).then(res => {
+      axios.get(process.env.API_DEMOS_ENDPOINT+"steamids/info?steamids="+this.$route.params.id).then(res => {
         this.profiles[this.$route.params.id] = res.data[this.$route.params.id]
         this.profiles.push({})
         this.user = res.data[this.$route.params.id]

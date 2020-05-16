@@ -168,7 +168,7 @@
         this.$socket.emit(`match-${this.player.match.id}-readyUp`, stringify(this.player))
       },
       getStats: function () {
-        axios.get("https://10mandemos.horizonservers.net/api/player/"+this.user.steamid+"/stats").then(res => {
+        axios.get(process.env.API_DEMOS_ENDPOINT+"player/"+this.user.steamid+"/stats").then(res => {
           this.stats = res.data
         })
       },
@@ -178,7 +178,7 @@
     },
 
     beforeMount () {
-      this.audio = new Audio('http://server2.horizonservers.net/queue.mp3')
+      this.audio = new Audio(process.env.BASE_URL + '/queue.mp3')
       this.$vuetify.theme.dark = this.darkMode
 
       if (this.user.steamid) {

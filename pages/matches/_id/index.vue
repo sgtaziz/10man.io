@@ -233,7 +233,7 @@ export default {
 
       this.queue.forEach((player) => {
         if (!this.stats[player.id]) {
-          axios.get("https://10mandemos.horizonservers.net/api/player/"+player.id+"/stats").then(res => {
+          axios.get(process.env.API_DEMOS_ENDPOINT+"player/"+player.id+"/stats").then(res => {
             this.stats[player.id] = res.data
             this.stats.push()
           })
@@ -249,7 +249,7 @@ export default {
 
       this.team1.forEach((player) => {
         if (!this.stats[player.id]) {
-          axios.get("https://10mandemos.horizonservers.net/api/player/"+player.id+"/stats").then(res => {
+          axios.get(process.env.API_DEMOS_ENDPOINT+"player/"+player.id+"/stats").then(res => {
             this.stats[player.id] = res.data
             this.stats.push()
           })
@@ -263,7 +263,7 @@ export default {
 
       this.team2.forEach((player) => {
         if (!this.stats[player.id]) {
-          axios.get("https://10mandemos.horizonservers.net/api/player/"+player.id+"/stats").then(res => {
+          axios.get(process.env.API_DEMOS_ENDPOINT+"player/"+player.id+"/stats").then(res => {
             this.stats[player.id] = res.data
             this.stats.push()
           })
