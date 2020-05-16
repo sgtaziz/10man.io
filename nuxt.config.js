@@ -9,6 +9,11 @@ let redisClient = redis.createClient()
 
 export default {
   mode: 'universal',
+
+  server: {
+    port: '38085',
+    host: '127.0.0.1'
+  },
   /*
    ** Headers of the page
    */
