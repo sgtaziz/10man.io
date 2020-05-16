@@ -1,0 +1,48 @@
+{
+  "name": "10man.io",
+  "version": "1.0.0",
+  "description": "10man.io - Host 10man CS:GO games and more",
+  "author": "Aziz Hasanain",
+  "private": true,
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "generate": "nuxt generate",
+    "test": "jest"
+  },
+  "lint-staged": {
+    "*.{js,vue}": "yarn lint"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "dependencies": {
+    "@nuxtjs/axios": "^5.3.6",
+    "@nuxtjs/dotenv": "^1.4.0",
+    "@nuxtjs/pwa": "^3.0.0-0",
+    "bignumber.js": "^9.0.0",
+    "connect-redis": "^4.0.4",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "flatted": "^2.0.2",
+    "nuxt": "^2.0.0",
+    "redis": "^3.0.2",
+    "steam-login": "^0.1.7",
+    "vue-chat-scroll": "^1.4.0",
+    "vue-moment": "^4.1.0",
+    "vue-socket.io": "3.0.7",
+    "vue-timeago": "^5.1.2"
+  },
+  "devDependencies": {
+    "@nuxtjs/vuetify": "^1.0.0",
+    "@vue/test-utils": "^1.0.0-beta.27",
+    "babel-jest": "^24.1.0",
+    "husky": "^4.0.0",
+    "jest": "^24.1.0",
+    "lint-staged": "^10.0.0",
+    "vue-jest": "^4.0.0-0"
+  }
+}
