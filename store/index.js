@@ -22,7 +22,6 @@ export default {
   },
   actions: {
     nuxtServerInit ({ commit }, { req }) {
-      console.log(req.session)
       if (req.session && req.session.steamUser) {
         commit('setUser', req.session.steamUser._json)
       }
