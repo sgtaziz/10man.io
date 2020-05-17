@@ -1,6 +1,5 @@
 const { Router } = require('express')
 const steam   = require('steam-login')
-const redis = require('redis')
 
 const router = Router()
 

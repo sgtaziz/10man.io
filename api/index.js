@@ -32,9 +32,11 @@ router.use((req, res, next) => {
 
 // Require API routes
 const steam = require('./routes/steam')
+const match = require('./routes/match')
 
 // Import API Routes
 app.use(steam)
+app.use(match)
 
 // Export the server middleware
 export default {
