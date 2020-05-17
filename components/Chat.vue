@@ -12,7 +12,7 @@
         <v-expand-transition>
           <div v-show="expanded">
             <v-list dense style="height: 225px;max-height: 225px;overflow-y: auto;" v-chat-scroll="{ smooth: true }">
-              <v-list-item v-for="(msg, i) in messages" :v-key="i">
+              <v-list-item v-for="(msg, i) in messages" :key="i">
                 <v-tooltip left nudge-right="5">
                   <template v-slot:activator="{ on }">
                     <v-list-item-avatar size="24" v-on="on">

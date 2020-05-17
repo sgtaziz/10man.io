@@ -40,7 +40,7 @@
             </v-card>
           </v-dialog>
         </v-card-title>
-        <v-data-table :headers="headers" :items="matches" :search="search" :loading="loading" :fixed-header="true" @click:row="joinMatch">
+        <v-data-table class="text-left" :headers="headers" :items="matches" :search="search" :loading="loading" :fixed-header="true" @click:row="joinMatch">
           <template v-slot:item.password="{ item }">
             <v-icon :color="item.password ? 'red' : 'green'">{{ item.password ? 'mdi-lock' : 'mdi-lock-open-variant' }}</v-icon>
           </template>

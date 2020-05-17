@@ -2,7 +2,7 @@
   <v-container class="text-center">
 
     <h1 class="display-1 font-weight-bold mb-3">
-      {{ !loading ? `Match #${$route.params.id}` : 'Loading...' }}
+      {{ !loading ? `Match #${player.match.id} - ${player.match.name}` : 'Loading...' }}
     </h1>
 
     <v-row v-if="!loading">
