@@ -39,7 +39,7 @@
     </v-navigation-drawer>
 
     <v-app-bar app clipped-left style="height: 64px;">
-      <v-toolbar-title>The Good 10 Man</v-toolbar-title>
+      <v-toolbar-title>10man.io</v-toolbar-title>
 
       <v-spacer></v-spacer>
 

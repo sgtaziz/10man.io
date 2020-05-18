@@ -111,6 +111,8 @@ export default {
     headers: [
       { text: 'ID', value: 'id', width: 65 },
       { text: 'Name', value: 'name' },
+      { text: 'Owner', value: 'owner.steam.personaname', width: 160 },
+      { text: 'Game', value: 'gameType', width: 100 },
       { text: 'Pass', value: 'password', width: 80 },
       { text: 'Players', value: 'players', width: 95 },
     ],
@@ -180,7 +182,7 @@ export default {
       this.player = player
 
       if (this.player.queued && this.player.match.id) {
-        //this.$router.push({ path: '/matches/'+this.player.match.id })
+        this.$router.push({ path: '/matches/'+this.player.match.id })
       }
     },
     matchJoined (mid) {
