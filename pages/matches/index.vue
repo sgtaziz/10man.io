@@ -8,7 +8,7 @@
       <v-card>
         <v-card-title>
           <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details style="margin: 0;padding: 0;" class="body-2 font-regular"></v-text-field>
-          <v-dialog v-model="createMatchDialog" max-width="350px">
+          <v-dialog v-model="createMatchDialog" max-width="400px">
             <template v-slot:activator="{ on }">
               <v-btn color="primary" v-on="on" style="margin-left: 10px;" outlined :loading="loading">Create Match</v-btn>
             </template>
@@ -24,6 +24,12 @@
                     </v-col>
                     <v-col cols="12">
                       <v-text-field v-model="password" label="Password" type="password"></v-text-field>
+                    </v-col>
+                    <v-col cols="6">
+                      <v-slider v-model="playersPerTeam" thumb-size="24" thumb-label="always" min="1" max="5" label="Team Size" height="70px"></v-slider>
+                    </v-col>
+                    <v-col cols="6">
+                      <v-overflow-btn v-model="gameType" :items="['csgo', 'valorant']" label="Game Type" dense></v-overflow-btn>
                     </v-col>
                     <v-col cols="12">
                       <v-slider v-model="timeToReady" thumb-size="24" thumb-label="always" min="5" max="60" label="Ready Time Limit"></v-slider>
@@ -45,7 +51,7 @@
             <v-icon :color="item.password ? 'red' : 'green'">{{ item.password ? 'mdi-lock' : 'mdi-lock-open-variant' }}</v-icon>
           </template>
           <template v-slot:item.players="{ item }">
-            {{ item.players.length }}/10
+            {{ item.players.length }}/{{ item.playersPerTeam * 2}}
           </template>
         </v-data-table>
       </v-card>
@@ -97,6 +103,8 @@ export default {
     matchName: '',
     password: '',
     passwordInput: '',
+    gameType: 'csgo',
+    playersPerTeam: 5,
     matches: [],
     matchToJoin: {},
     timeToReady: 25,
@@ -127,6 +135,8 @@ export default {
         player: tempPlayer,
         timeToReady: this.timeToReady,
         pass: this.password,
+        gameType: this.gameType,
+        playersPerTeam: this.playersPerTeam,
       })
 
       this.creatingMatch = true
@@ -170,7 +180,7 @@ export default {
       this.player = player
 
       if (this.player.queued && this.player.match.id) {
-        this.$router.push({ path: '/matches/'+this.player.match.id })
+        //this.$router.push({ path: '/matches/'+this.player.match.id })
       }
     },
     matchJoined (mid) {
