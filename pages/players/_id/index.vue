@@ -133,7 +133,7 @@
       </v-row>
     </v-data-iterator>
 
-    <v-data-table :headers="headers" :items="demoStats" item-key="demoid" @click:row="expandRow" show-expand single-expand :expanded.sync="expanded" :options="{ sortBy: ['timestamp'], sortDesc: [true] }" :loading="loading" class="elevation-5 text-left" disable-sort>
+    <v-data-table :headers="headers" :items="demoStats" item-key="demoid" @click:row="expandRow" show-expand single-expand :expanded.sync="expanded" :options="{ sortBy: ['timestamp'], sortDesc: [true] }" class="elevation-5 text-left" disable-sort>
       <template v-slot:top>
         <v-toolbar flat>
           <v-toolbar-title>Matches</v-toolbar-title>
@@ -182,49 +182,27 @@ export default {
   middleware: 'auth',
   head() {
     return {
-      title: this.profiles[this.$route.params.id] ? this.profiles[this.$route.params.id].personaname : 'Loading...'
+      title: this.user.personaname
     }
   },
+
   components: {
     TeamScoreboard
   },
 
   data: () => ({
-    stats: null,
-    loading: true,
-    statItems: [],
-    demos: [],
-    demoStats: [],
-    playerTeam: [],
-    profiles: [],
     expanded: [],
-    matchStats: [],
     headers: [
-      { text: 'Date', value: 'timestamp' },
-      { text: 'Map', value: 'map' },
+      { text: 'Date', value: 'timestamp', width: 240 },
+      { text: 'Map', value: 'map', width: 140 },
       { text: 'Score', value: 'score' },
-      { text: 'Kills', value: 'kills' },
-      { text: 'Deaths', value: 'deaths' },
-      { text: 'Assists (FA)', value: 'assists' },
-      { text: 'ADR', value: 'adr' },
-      { text: 'Demo', value: 'demo' },
+      { text: 'Kills', value: 'kills', width: 50 },
+      { text: 'Deaths', value: 'deaths', width: 50 },
+      { text: 'Assists (FA)', value: 'assists', width: 100 },
+      { text: 'ADR', value: 'adr', width: 80 },
+      { text: 'Demo', value: 'demo', width: 80 },
     ],
-    user: {},
   }),
-
-  watch: {
-    '$route' () {
-      this.stats = null
-      this.loading = true
-      this.statItems = []
-      this.demos = []
-      this.demoStats = []
-      this.playerTeam = []
-      this.expanded = []
-      this.matchStats = []
-      this.getData()
-    },
-  },
 
   methods: {
     expandRow (row) {
@@ -248,107 +226,110 @@ export default {
     downloadDemo (demoid) {
       window.location.href = process.env.DEMOS_DL_ENDPOINT + demoid
     },
-    getData () {
-      let steamIDs = []
-      let promises = []
-
-      axios.get(process.env.API_DEMOS_ENDPOINT+"player/"+this.$route.params.id+"/stats").then(res => {
-        this.stats = res.data
-        this.statItems = [
-          {
-            win: Math.round(this.stats.won/(this.stats.won+this.stats.lost) * 100 * 100)/100,
-            won: this.stats.won,
-            tied: this.stats.tied,
-            lost: this.stats.lost,
-            total: this.stats.won+this.stats.lost
-          },
-          {
-            kdr: Math.round(this.stats.kills/this.stats.deaths * 100)/100,
-            hs: Math.round(this.stats.hs_percent * 100)/100,
-            rating: Math.round(this.stats.rating * 100)/100,
-            rws: Math.round(this.stats.rws/this.stats.rounds * 100)/100,
-            clutch: (Math.round((this.stats['1v1_won']/this.stats['1v1_attempted']) * 100 * 100)/100) | 0
-          },
-          {
-            adr: Math.round(this.stats.damage/this.stats.rounds * 100)/100,
-            kpr: Math.round(this.stats.kills/this.stats.rounds * 100)/100,
-            dpr: Math.round(this.stats.deaths/this.stats.rounds * 100)/100,
-            apr: Math.round(this.stats.assists/this.stats.rounds * 100)/100,
-            ekpr: Math.round(this.stats.entry_kills/this.stats.rounds * 100)/100,
-          },
-          {
-            threek: this.stats.rounds_with_kills[3],
-            fourk: this.stats.rounds_with_kills[4],
-            fivek: this.stats.rounds_with_kills[5],
-            entrywin: Math.round(this.stats.entry_kills/this.stats.entry_kills_attempted * 100 * 100)/100,
-            openkills: Math.round(this.stats.open_kills/this.stats.open_kills_attempted * 100 * 100)/100
-          }
-        ]
-      })
-
-      axios.get(process.env.API_DEMOS_ENDPOINT+"player/"+this.$route.params.id+"/demos?offset=0").then(res => {
-        this.demos = res.data.demos
-
-        for (let i = 0; i < this.demos.length; i++) {
-          promises.push(axios.get(process.env.API_DEMOS_ENDPOINT+"demo/"+this.demos[i].demoid+"/stats"))
-        }
-
-        Promise.all(promises).then(results => {
-          results.forEach(res => {
-            let demoStats = res.data
-            this.demoStats.push(demoStats)
-            for (let ii = 0; ii < demoStats.teams['2'].length; ii++) {
-              if (demoStats.teams['2'][ii].steamid == this.user.steamid) {
-                this.matchStats[demoStats.demoid] = demoStats.teams['2'][ii]
-                this.playerTeam[demoStats.demoid] = 2
-              }
-              steamIDs.push(demoStats.teams['2'][ii].steamid)
-            }
-
-            for (let ii = 0; ii < demoStats.teams['3'].length; ii++) {
-              if (demoStats.teams['3'][ii].steamid == this.user.steamid) {
-                this.matchStats[demoStats.demoid] = demoStats.teams['3'][ii]
-                this.playerTeam[demoStats.demoid] = 3
-              }
-              steamIDs.push(demoStats.teams['3'][ii].steamid)
-            }
-
-            demoStats.teams['2'].sort((a, b) => (a.kills > b.kills) ? -1 : 1)
-            demoStats.teams['3'].sort((a, b) => (a.kills > b.kills) ? -1 : 1)
-
-            this.matchStats.push({})
-          })
-
-          this.demoStats.sort((a, b) => (a.timestmap > b.timestmap) ? -1 : 1)
-          let distinctSteamIDs = [...new Set(steamIDs)]
-
-          for (let i = 0; i < distinctSteamIDs.length; i++) {
-            let steamid = distinctSteamIDs[i]
-            if (this.profiles[steamid]) {
-              distinctSteamIDs.splice(i, 1)
-            }
-          }
-
-          axios.get(process.env.API_DEMOS_ENDPOINT+"steamids/info?steamids="+distinctSteamIDs.join(',')).then(res => {
-            for (const steamid in res.data) {
-              this.profiles[steamid] = res.data[steamid]
-            }
-
-            this.loading = false
-          })
-        })
-      })
-
-      axios.get(process.env.API_DEMOS_ENDPOINT+"steamids/info?steamids="+this.$route.params.id).then(res => {
-        this.profiles[this.$route.params.id] = res.data[this.$route.params.id]
-        this.profiles.push({})
-        this.user = res.data[this.$route.params.id]
-      })
-    },
   },
 
-  beforeMount () {
-    this.getData()
+  async asyncData({ params, error }) {
+    let steamIDs = []
+    let promises = []
+    let profiles = []
+    let user = {}
+
+    let { data } = await axios.get(process.env.API_DEMOS_ENDPOINT+"player/"+params.id+"/stats")
+    let stats = data
+    let statItems = [
+      {
+        win: Math.round(stats.won/(stats.won+stats.lost) * 100 * 100)/100,
+        won: stats.won,
+        tied: stats.tied,
+        lost: stats.lost,
+        total: stats.won+stats.lost
+      },
+      {
+        kdr: Math.round(stats.kills/stats.deaths * 100)/100,
+        hs: Math.round(stats.hs_percent * 100)/100,
+        rating: Math.round(stats.rating * 100)/100,
+        rws: Math.round(stats.rws/stats.rounds * 100)/100,
+        clutch: (Math.round((stats['1v1_won']/stats['1v1_attempted']) * 100 * 100)/100) | 0
+      },
+      {
+        adr: Math.round(stats.damage/stats.rounds * 100)/100,
+        kpr: Math.round(stats.kills/stats.rounds * 100)/100,
+        dpr: Math.round(stats.deaths/stats.rounds * 100)/100,
+        apr: Math.round(stats.assists/stats.rounds * 100)/100,
+        ekpr: Math.round(stats.entry_kills/stats.rounds * 100)/100,
+      },
+      {
+        threek: stats.rounds_with_kills[3],
+        fourk: stats.rounds_with_kills[4],
+        fivek: stats.rounds_with_kills[5],
+        entrywin: Math.round(stats.entry_kills/stats.entry_kills_attempted * 100 * 100)/100,
+        openkills: Math.round(stats.open_kills/stats.open_kills_attempted * 100 * 100)/100
+      }
+    ]
+
+    let res = await axios.get(process.env.API_DEMOS_ENDPOINT+"steamids/info?steamids="+params.id)
+    profiles[params.id] = res.data[params.id]
+    user = res.data[params.id]
+    if (!user.personaname) return error({ statusCode: 404, message: 'Player not found' })
+
+    res = await axios.get(process.env.API_DEMOS_ENDPOINT+"player/"+params.id+"/demos?offset=0")
+    let demos = res.data.demos
+
+    for (let i = 0; i < demos.length; i++) {
+      promises.push(axios.get(process.env.API_DEMOS_ENDPOINT+"demo/"+demos[i].demoid+"/stats"))
+    }
+
+    const demoStats = []
+    const playerTeam = []
+    const matchStats = []
+
+    const results = await Promise.all(promises)
+    results.forEach(res => {
+      let demoStat = res.data
+      demoStats.push(demoStat)
+
+      for (let ii = 0; ii < demoStat.teams['2'].length; ii++) {
+        if (demoStat.teams['2'][ii].steamid == user.steamid) {
+          matchStats[demoStat.demoid] = demoStat.teams['2'][ii]
+          playerTeam[demoStat.demoid] = 2
+        }
+        steamIDs.push(demoStat.teams['2'][ii].steamid)
+      }
+
+      for (let ii = 0; ii < demoStat.teams['3'].length; ii++) {
+        if (demoStat.teams['3'][ii].steamid == user.steamid) {
+          matchStats[demoStat.demoid] = demoStat.teams['3'][ii]
+          playerTeam[demoStat.demoid] = 3
+        }
+        steamIDs.push(demoStat.teams['3'][ii].steamid)
+      }
+
+      demoStat.teams['2'].sort((a, b) => (a.kills > b.kills) ? -1 : 1)
+      demoStat.teams['3'].sort((a, b) => (a.kills > b.kills) ? -1 : 1)
+    })
+
+    demoStats.sort((a, b) => (a.timestmap > b.timestmap) ? -1 : 1)
+    const distinctSteamIDs = [...new Set(steamIDs)]
+
+    for (let i = 0; i < distinctSteamIDs.length; i++) {
+      let steamid = distinctSteamIDs[i]
+      if (profiles[steamid]) {
+        distinctSteamIDs.splice(i, 1)
+      }
+    }
+
+    res = await axios.get(process.env.API_DEMOS_ENDPOINT+"steamids/info?steamids="+distinctSteamIDs.join(','))
+    for (const steamid in res.data) {
+      profiles[steamid] = res.data[steamid]
+    }
+
+    return { profiles, user, stats, statItems, demos, demoStats, matchStats, playerTeam }
   },
 }
 </script>
+
+<style>
+.v-data-table tbody tr {
+  cursor: pointer;
+}
+</style>

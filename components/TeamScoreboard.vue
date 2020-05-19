@@ -26,6 +26,15 @@
     <template v-slot:item.hs_percent="{ item }">
       {{ Math.round(item.hs_percent*100)/100 }}
     </template>
+    <template v-slot:item.3k="{ item }">
+      {{ item.rounds_with_kills['3'] }}
+    </template>
+    <template v-slot:item.4k="{ item }">
+      {{ item.rounds_with_kills['4'] }}
+    </template>
+    <template v-slot:item.5k="{ item }">
+      {{ item.rounds_with_kills['5'] }}
+    </template>
   </v-data-table>
 </template>
 
@@ -40,13 +49,16 @@ export default Vue.extend({
       pHeaders: [
         { text: '', value: 'image', sortable: false, width: '1px'},
         { text: 'Name', value: 'name' },
-        { text: 'Kills', value: 'kills' },
-        { text: 'Deaths', value: 'deaths' },
-        { text: 'Assists (FA)', value: 'assists' },
-        { text: 'HS %', value: 'hs_percent' },
-        { text: 'ADR', value: 'adr' },
-        { text: 'RWS', value: 'rws' },
-        { text: 'Rating', value: 'rating' },
+        { text: 'Kills', value: 'kills', width: 80 },
+        { text: 'Deaths', value: 'deaths', width: 80 },
+        { text: 'Assists (FA)', value: 'assists', width: 100 },
+        { text: 'HS %', value: 'hs_percent', width: 80 },
+        { text: 'ADR', value: 'adr', width: 80 },
+        { text: 'RWS', value: 'rws', width: 80 },
+        { text: 'Rating', value: 'rating', width: 80 },
+        { text: '3k', value: '3k', width: 40 },
+        { text: '4k', value: '4k', width: 40 },
+        { text: '5k', value: '5k', width: 40 },
       ],
     }
   },

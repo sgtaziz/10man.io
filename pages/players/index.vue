@@ -9,7 +9,7 @@
         <v-card-title>
           <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details></v-text-field>
         </v-card-title>
-        <v-data-table :headers="headers" :items="players" :search="search" :loading="loading" :fixed-header="true" @click:row="playerClick" :options="{ sortBy: ['rating'], sortDesc: [true] }">
+        <v-data-table class="text-left" :headers="headers" :items="players" :search="search" :fixed-header="true" @click:row="playerClick" :options="{ sortBy: ['rating'], sortDesc: [true] }">
           <template v-slot:item.image="{ item }">
             <div class="p-2">
               <v-avatar size="32"><v-img :src="profiles[item.steamid].avatarfull" :alt="item.name"></v-img></v-avatar>
@@ -39,18 +39,14 @@ export default {
     headers: [
       { text: '', value: 'image', sortable: false, width: '1px'},
       { text: 'Name', value: 'name' },
-      { text: 'Score', value: 'score' },
-      { text: 'RWS', value: 'rws' },
-      { text: 'Rating', value: 'rating' },
-      { text: 'ADR', value: 'adr' },
-      { text: 'KDR', value: 'kdr' },
-      { text: 'HS%', value: 'hs' },
-      { text: 'Wins', value: 'won' },
+      { text: 'Score', value: 'score', width: 140 },
+      { text: 'RWS', value: 'rws', width: 140 },
+      { text: 'Rating', value: 'rating', width: 140 },
+      { text: 'ADR', value: 'adr', width: 140 },
+      { text: 'KDR', value: 'kdr', width: 140 },
+      { text: 'HS%', value: 'hs', width: 140 },
+      { text: 'Wins', value: 'won', width: 140 },
     ],
-    players: [],
-    loading: true,
-    promises: [],
-    profiles: [],
   }),
 
   methods: {
@@ -63,54 +59,53 @@ export default {
     }
   },
 
-  beforeMount () {
-    const tempPlayers = []
+  async asyncData({ app }) {
+    const { data } = await axios.get(process.env.API_ENDPOINT+"overview")
 
-    axios.get(process.env.API_ENDPOINT+"overview").then(res => {
-      const ids = []
+    const ids = []
+    const players = []
+    let profiles = []
+    const promises = []
 
-      for (let i = 0; i < res.data.length; i++) {
-        const data = res.data[i]
+    for (let i = 0; i < data.length; i++) {
+      const player = data[i]
+      const steamidParts = player.steam.split(':')
 
-        data.steamid = this.to64(data.steam)
-        ids.push(data.steamid)
+      player.steamid = (new BigNumber(steamidParts[2])).times(2).plus(new BigNumber('76561197960265728')).plus(new BigNumber(steamidParts[1])).toString()
+      ids.push(player.steamid)
 
-        this.promises.push(axios.get(process.env.API_DEMOS_ENDPOINT+"player/"+data.steamid+"/stats"))
-        tempPlayers.push(data)
+      promises.push(axios.get(process.env.API_DEMOS_ENDPOINT+"player/"+player.steamid+"/stats"))
+      players.push(player)
+    }
+
+    promises.push(axios.get(process.env.API_DEMOS_ENDPOINT+"steamids/info?steamids="+ids.join(',')))
+
+    const results = await Promise.all(promises)
+
+    results.forEach(res => {
+      if (res.config.url.split('/')[4] == "steamids") {
+        profiles = res.data
+      } else {
+        const index = players.findIndex(x => x.steamid == res.config.url.split('/')[5])
+
+        if (index > -1) {
+          players[index].rating = Math.round(res.data.rating * 100)/100 || 0
+          players[index].rws = Math.round(res.data.rws/res.data.rounds * 100)/100 || 0
+          players[index].hs = Math.round(res.data.hs_percent * 100)/100 || 0
+          players[index].adr = Math.round(res.data.damage/res.data.rounds * 100)/100 || 0
+          players[index].kdr = Math.round(res.data.kills/res.data.deaths * 100)/100 || 0
+          players[index].won = res.data.won
+        }
       }
-
-      this.promises.push(axios.get(process.env.API_DEMOS_ENDPOINT+"steamids/info?steamids="+ids.join(',')))
-
-      Promise.all(this.promises).then(results => {
-        results.forEach(res => {
-          if (res.config.url.split('/')[4] == "steamids") {
-            for (const steamid in res.data) {
-              this.profiles[steamid] = res.data[steamid]
-            }
-          } else {
-            const index = tempPlayers.findIndex(x => x.steamid == res.config.url.split('/')[5])
-
-            if (index > -1) {
-              tempPlayers[index].rating = Math.round(res.data.rating * 100)/100 || 0
-              tempPlayers[index].rws = Math.round(res.data.rws/res.data.rounds * 100)/100 || 0
-              tempPlayers[index].hs = Math.round(res.data.hs_percent * 100)/100 || 0
-              tempPlayers[index].adr = Math.round(res.data.damage/res.data.rounds * 100)/100 || 0
-              tempPlayers[index].kdr = Math.round(res.data.kills/res.data.deaths * 100)/100 || 0
-              tempPlayers[index].won = res.data.won
-            }
-          }
-        })
-
-        this.players = tempPlayers
-        this.loading = false
-      })
     })
+    console.log(profiles)
+    return { players, profiles }
   },
 }
 </script>
 
 <style>
-.v-data-table tr {
+.v-data-table tbody tr {
   cursor: pointer;
 }
 </style>
