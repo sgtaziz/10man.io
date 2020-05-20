@@ -180,7 +180,7 @@
       }
     },
 
-    beforeMount () {
+    mounted () {
       this.audio = new Audio(process.env.BASE_URL + '/queue.mp3')
       this.$vuetify.theme.dark = this.darkMode
 

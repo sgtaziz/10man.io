@@ -1,8 +1,8 @@
 <template>
   <v-container class="text-center" v-if="stats">
 
-    <h1 class="display-1 font-weight-bold mb-3" v-if="profiles[$route.params.id]">
-      <v-avatar size="64"><img :src="profiles[$route.params.id].avatarfull" class="my-3" /></v-avatar> <span style="margin-top: -20px;">{{ profiles[$route.params.id].personaname }}</span>
+    <h1 class="display-1 font-weight-bold mb-3" v-if="user">
+      <v-avatar size="64"><img :src="user.avatarfull" class="my-3" /></v-avatar> <span style="margin-top: -20px;">{{ user.personaname }}</span>
     </h1>
 
     <v-data-iterator :items="statItems" hide-default-footer v-if="stats">
