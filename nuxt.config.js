@@ -69,7 +69,7 @@ export default {
 
   oneSignal: {
     init: {
-      appId: process.env.OS_APPID
+      appId: process.env.OS_APPID,
       allowLocalhostAsSecureOrigin: true,
       safari_web_id: process.env.OS_SWEBID,
     },
