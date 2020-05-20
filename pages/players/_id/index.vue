@@ -193,14 +193,14 @@ export default {
   data: () => ({
     expanded: [],
     headers: [
-      { text: 'Date', value: 'timestamp', width: 240 },
-      { text: 'Map', value: 'map', width: 140 },
+      { text: 'Date', value: 'timestamp', width: 200 },
+      { text: 'Map', value: 'map', width: 95 },
       { text: 'Score', value: 'score' },
-      { text: 'Kills', value: 'kills', width: 50 },
-      { text: 'Deaths', value: 'deaths', width: 50 },
-      { text: 'Assists (FA)', value: 'assists', width: 100 },
-      { text: 'ADR', value: 'adr', width: 80 },
-      { text: 'Demo', value: 'demo', width: 80 },
+      { text: 'Kills', value: 'kills', width: 35 },
+      { text: 'Deaths', value: 'deaths', width: 35 },
+      { text: 'Assists (FA)', value: 'assists', width: 98 },
+      { text: 'ADR', value: 'adr', width: 70 },
+      { text: 'Demo', value: 'demo', width: 70 },
     ],
   }),
 
