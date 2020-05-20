@@ -515,8 +515,4 @@
   .rotating {
     animation: rotation 0.5s infinite linear;
   }
-
-  .v-dialog:not(.v-dialog--fullscreen) {
-    max-height: 80%;
-  }
 </style>

@@ -1,10 +1,10 @@
 <template>
-  <v-layout v-if="user && user.steamid" style="z-index: 999;">
-    <v-flex style="position: fixed; bottom: 0;right: 0;transition: width 0.3s;max-width: 100%;" :style="expanded ? 'width: 420px;' : 'width: 103px;'">
+  <v-layout v-if="user && user.steamid" style="z-index: 199;">
+    <v-flex style="position: fixed; bottom: 0;right: 0;transition: width 0.3s;max-width: 100%;" :style="expanded ? 'width: 420px;' : 'width: 107px;'">
       <v-badge color="red" v-if="notifications > 0" :content="notifications" left offset-y="17.5" offset-x="10" style="z-index: 99"></v-badge>
       <v-card class="elevation-12">
         <v-toolbar @click="expand" tile>
-          <v-toolbar-title style="cursor: pointer;">
+          <v-toolbar-title style="cursor: pointer;width:100%">
             Chat
             <v-icon>{{ expanded ? 'mdi-chevron-down' : 'mdi-chevron-up'}}</v-icon>
           </v-toolbar-title>

@@ -2,7 +2,7 @@
   <v-container class="text-center">
 
     <h1 class="display-1 font-weight-bold mb-3">
-      {{ (!loading && player.match) ? `Match #${player.match.id} - ${player.match.name}` : 'Loading...' }}
+      {{ (!loading && match.id) ? `Match #${match.id} - ${match.name}` : 'Loading...' }}
     </h1>
 
     <v-row v-if="!loading">
@@ -57,7 +57,7 @@
           <v-card-title class="subheading font-weight-bold" v-else-if="queueInfo.event == 'live'">LIVE {{ queueInfo.score1 }}-{{ queueInfo.score2 }}</v-card-title>
           <v-card-title class="subheading font-weight-bold" v-else>{{ inQueue ? "In Queue" : "Queue" }}</v-card-title>
 
-          <v-card-subtitle class="text-left" v-if="queue.length < 10 && !queueInfo.event">+{{ 10 - queue.length }}</v-card-subtitle>
+          <v-card-subtitle class="text-left" v-if="queue.length < match.limit && !queueInfo.event">+{{ match.limit - queue.length }}</v-card-subtitle>
           <v-card-subtitle class="text-left" v-else-if="!capts.c0 || !capts.c1">Waiting on captains...</v-card-subtitle>
           <v-card-subtitle class="text-left" v-else-if="queueInfo.event == 'pickPlayers' && pickPos < 8">Waiting on {{ capts['c'+queueInfo.order[pickPos]].steam.personaname }}...</v-card-subtitle>
           <v-card-subtitle class="text-left" v-else-if="queueInfo.event == 'mapVeto' && queueInfo.maps.length > 1">Waiting on {{ capts['c'+queueInfo.turn].steam.personaname }}...</v-card-subtitle>
@@ -111,7 +111,7 @@
           </v-card-text>
 
           <v-card-actions>
-            <v-btn :color="inQueue ? 'red' : 'primary'" text v-on:click="joinQueue(inQueue)" :disabled="queueInfo.event">{{ inQueue ? 'Leave' : 'Join' }}</v-btn>
+            <v-btn :color="inQueue ? 'red' : 'primary'" text v-on:click="joinQueue(inQueue)" :disabled="queueInfo.event || (!inQueue && match.limit == queue.length)">{{ inQueue ? 'Leave' : 'Join' }}</v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -183,6 +183,7 @@ export default {
     showIP: false,
     loading: true,
     player: {},
+    match: {},
     max16chars: v => v.length <= 16 || 'Input too long!',
   }),
 
@@ -218,18 +219,19 @@ export default {
 
     getPlayer (player) {
       player = parse(player)
+
       this.player = player
-
-      if (this.player.match.id != this.$route.params.id) {
-        this.$router.push({ path: '/matches' })
-        return
-      }
-
       this.emit('requestData', stringify(player))
     },
 
     queueData (data) {
       this.queue = parse(data)
+
+      if (this.queue.length == 0) {
+        console.log('called this')
+        this.$router.push({ path: '/matches' })
+        return
+      }
 
       this.queue.forEach((player) => {
         if (!this.stats[player.id]) {
@@ -289,6 +291,15 @@ export default {
       } else if (data.event == 'mapVeto') {
         this.maps = this.queueInfo.maps
       }
+    },
+
+    matchInfo (data) {
+      this.match = data
+    },
+
+    wrongRoute () {
+      console.log('called this')
+      this.$router.push({ path: '/matches' })
     }
   },
 
@@ -303,6 +314,7 @@ export default {
         return
       }
 
+      if (this.match.limit == this.queue.length) return
       this.emit('joinQueue', this.player)
     },
 

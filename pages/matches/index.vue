@@ -11,45 +11,45 @@
             <v-col cols="12" sm="9" md="9" lg="10">
               <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details style="margin: 0;padding: 0;" class="body-2 font-regular"></v-text-field>
             </v-col>
-            <v-col cols="12" sm="3" md="3" lg="2">
-              <v-dialog v-model="createMatchDialog">
-                <template v-slot:activator="{ on }">
+            <v-dialog v-model="createMatchDialog" max-width="600px">
+              <template v-slot:activator="{ on }">
+                <v-col cols="12" sm="3" md="3" lg="2">
                   <v-btn color="primary" style="width: 100%" v-on="on" outlined :loading="loading">New Match</v-btn>
-                </template>
-                <v-card>
-                  <v-card-title>
-                    <span class="headline">Create Match</span>
-                  </v-card-title>
-                  <v-card-text>
-                    <v-container>
-                      <v-row>
-                        <v-col cols="12">
-                          <v-text-field v-model="matchName" label="Match Name *" :rules="[v => !!v || 'Match Name is required']" required></v-text-field>
-                        </v-col>
-                        <v-col cols="12">
-                          <v-text-field v-model="password" label="Password" type="password"></v-text-field>
-                        </v-col>
-                        <v-col cols="6">
-                          <v-slider v-model="playersPerTeam" thumb-size="24" thumb-label="always" min="1" max="5" label="Team Size" height="70px"></v-slider>
-                        </v-col>
-                        <v-col cols="6">
-                          <v-overflow-btn v-model="gameType" :items="['csgo', 'valorant']" label="Game Type" dense></v-overflow-btn>
-                        </v-col>
-                        <v-col cols="12">
-                          <v-slider v-model="timeToReady" thumb-size="24" thumb-label="always" min="5" max="60" label="Ready Time Limit"></v-slider>
-                        </v-col>
-                      </v-row>
-                    </v-container>
-                    <small>*indicates required field</small>
-                  </v-card-text>
-                  <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="primary darken-1" text @click="createMatchDialog = false">Close</v-btn>
-                    <v-btn color="primary darken-1" text @click="createMatch" :disabled="matchName == ''" :loading="creatingMatch">Create</v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-dialog>
-            </v-col>
+                </v-col>
+              </template>
+              <v-card>
+                <v-card-title>
+                  <span class="headline">Create Match</span>
+                </v-card-title>
+                <v-card-text>
+                  <v-container>
+                    <v-row>
+                      <v-col cols="12">
+                        <v-text-field v-model="matchName" label="Match Name *" :rules="[v => !!v || 'Match Name is required']" required></v-text-field>
+                      </v-col>
+                      <v-col cols="12">
+                        <v-text-field v-model="password" label="Password" type="password"></v-text-field>
+                      </v-col>
+                      <v-col cols="6">
+                        <v-slider v-model="playersPerTeam" thumb-size="24" thumb-label="always" min="1" max="5" label="Team Size" height="70px"></v-slider>
+                      </v-col>
+                      <v-col cols="6">
+                        <v-overflow-btn v-model="gameType" :items="['csgo', 'valorant']" label="Game Type" dense></v-overflow-btn>
+                      </v-col>
+                      <v-col cols="12">
+                        <v-slider v-model="timeToReady" thumb-size="24" thumb-label="always" min="5" max="60" label="Ready Time Limit"></v-slider>
+                      </v-col>
+                    </v-row>
+                  </v-container>
+                  <small>*indicates required field</small>
+                </v-card-text>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="primary darken-1" text @click="createMatchDialog = false">Close</v-btn>
+                  <v-btn color="primary darken-1" text @click="createMatch" :disabled="matchName == ''" :loading="creatingMatch">Create</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
           </v-row>
         </v-card-title>
         <v-data-table class="text-left" :headers="headers" :items="matches" :search="search" :loading="loading" :fixed-header="true" @click:row="joinMatch">
@@ -197,7 +197,6 @@ export default {
     },
     matchJoinFailed () {
       this.joinDisabled = false
-      this.joinMatchDialog = false
       this.passError = true
     },
   },
