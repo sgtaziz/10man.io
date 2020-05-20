@@ -1,6 +1,6 @@
 <template>
   <v-app :dark="darkMode">
-    <v-navigation-drawer v-if="user.steamid" app permanent expand-on-hover mini-variant clipped>
+    <v-navigation-drawer v-if="user.steamid" v-model="drawer" app :expand-on-hover="!isMobile" :mini-variant="!isMobile" clipped :temporary="isMobile" :permanent="!isMobile">
       <v-layout column fill-height>
         <v-list dense nav class="py-0">
           <v-list-item two-line class='px-0'>
@@ -16,7 +16,7 @@
 
           <v-divider></v-divider>
 
-          <v-list-item v-for="item in items" :key="item.title" router :to="item.to" exact v-on:mouseover="hover(item, true)" v-on:mouseleave="hover(item, false)">
+          <v-list-item v-for="item in items" :key="item.title" v-model="group" router :to="item.to" exact v-on:mouseover="hover(item, true)" v-on:mouseleave="hover(item, false)">
             <v-list-item-icon>
               <v-icon>{{ item.icon }}</v-icon>
             </v-list-item-icon>
@@ -39,7 +39,8 @@
     </v-navigation-drawer>
 
     <v-app-bar app clipped-left style="height: 64px;">
-      <v-toolbar-title>10man.io</v-toolbar-title>
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer" v-if="isMobile"></v-app-bar-nav-icon>
+      <v-toolbar-title :style="isMobile ? 'padding-left: 0;' : ''">10man.io</v-toolbar-title>
 
       <v-spacer></v-spacer>
 
@@ -51,7 +52,7 @@
       </v-btn>
     </v-app-bar>
 
-    <v-content style="padding-left: 56px;padding-bottom: 55px;">
+    <v-content style="padding-bottom: 55px;" :style="user.steamid && !isMobile ? 'padding-left: 56px;' : ''">
       <v-container class="fill-height" fluid align="center" justify="center">
         <transition name="slide-up">
           <!-- <keep-alive> -->
@@ -115,6 +116,8 @@
     data: () => ({
       authWindow: null,
       queueData: {},
+      drawer: false,
+      group: null,
       timeLeft: 100,
       estimatedTime: new Date().getTime(),
       dialog: false,
@@ -122,11 +125,21 @@
       stats: {},
       hoverState: [],
       player: {},
+      windowWidth: 0,
     }),
+
+    watch: {
+      group () {
+        this.drawer = false
+      }
+    },
 
     computed: {
       user () {
         return this.$store.state.user
+      },
+      isMobile () {
+        return this.windowWidth <= 760
       },
       queueUp () {
         return this.$store.state.queueUp && (this.queueData.ready && (this.queueData.ready.findIndex(x => x.id == this.user.steamid) > -1 || this.queueData.notready.findIndex(x => x.id == this.user.steamid) > -1))
@@ -181,6 +194,15 @@
     },
 
     mounted () {
+      window.onresize = () => {
+        if (window.innerWidth <= 760 && window.innerWidth != this.windowWidth) {
+          this.drawer = false
+          console.log('bruh resized')
+        }
+        this.windowWidth = window.innerWidth
+      }
+
+      this.windowWidth = window.innerWidth
       this.audio = new Audio(process.env.BASE_URL + '/queue.mp3')
       this.$vuetify.theme.dark = this.darkMode
 
@@ -492,5 +514,9 @@
 
   .rotating {
     animation: rotation 0.5s infinite linear;
+  }
+
+  .v-dialog:not(.v-dialog--fullscreen) {
+    max-height: 80%;
   }
 </style>

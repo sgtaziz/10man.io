@@ -231,7 +231,7 @@ export default {
   async asyncData({ params, error }) {
     let steamIDs = []
     let promises = []
-    let profiles = []
+    let profiles = {}
     let user = {}
 
     let { data } = await axios.get(process.env.API_DEMOS_ENDPOINT+"player/"+params.id+"/stats")
@@ -268,7 +268,7 @@ export default {
     ]
 
     let res = await axios.get(process.env.API_DEMOS_ENDPOINT+"steamids/info?steamids="+params.id)
-    profiles[params.id] = res.data[params.id]
+    profiles = res.data
     user = res.data[params.id]
     if (!user.personaname) return error({ statusCode: 404, message: 'Player not found' })
 
@@ -319,9 +319,7 @@ export default {
     }
 
     res = await axios.get(process.env.API_DEMOS_ENDPOINT+"steamids/info?steamids="+distinctSteamIDs.join(','))
-    for (const steamid in res.data) {
-      profiles[steamid] = res.data[steamid]
-    }
+    profiles = { ...profiles, ...res.data }
 
     return { profiles, user, stats, statItems, demos, demoStats, matchStats, playerTeam }
   },
