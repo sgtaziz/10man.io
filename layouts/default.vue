@@ -163,6 +163,9 @@
       },
       logout: function () {
         window.location.pathname = '/api/logout'
+        this.$OneSignal.push(() => {
+          this.$OneSignal.removeExternalUserId()
+        })
       },
       ready: function () {
         this.$socket.emit(`match-${this.player.match.id}-readyUp`, stringify(this.player))
@@ -185,6 +188,10 @@
         this.initPlayer()
         this.getStats()
         this.$store.dispatch('queueUp', false)
+
+        this.$OneSignal.push(() => {
+          this.$OneSignal.setExternalUserId(this.user.steamid)
+        })
       }
     },
 

@@ -56,6 +56,7 @@ export default {
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
+    '@nuxtjs/onesignal',
     '@nuxtjs/pwa',
     // Doc: https://github.com/nuxt-community/dotenv-module
     '@nuxtjs/dotenv'
@@ -65,6 +66,17 @@ export default {
    ** See https://axios.nuxtjs.org/options
    */
   axios: {},
+
+  oneSignal: {
+    init: {
+      appId: process.env.ONE_SIGNAL,
+      allowLocalhostAsSecureOrigin: true
+    },
+    notifyButton: {
+      enable: true,
+      size: 'small',
+    }
+  },
   /*
    ** vuetify module configuration
    ** https://github.com/nuxt-community/vuetify-module
