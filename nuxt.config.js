@@ -35,6 +35,12 @@ export default {
    ** Customize the progress-bar color
    */
   loading: { color: 'red' },
+  pwa: {
+    meta: {
+      nativeUI: true,
+      theme_color: 'black',
+    }
+  },
   /*
    ** Global CSS
    */
