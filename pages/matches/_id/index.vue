@@ -228,7 +228,6 @@ export default {
       this.queue = parse(data)
 
       if (this.queue.length == 0) {
-        console.log('called this')
         this.$router.push({ path: '/matches' })
         return
       }
@@ -298,7 +297,6 @@ export default {
     },
 
     wrongRoute () {
-      console.log('called this')
       this.$router.push({ path: '/matches' })
     }
   },

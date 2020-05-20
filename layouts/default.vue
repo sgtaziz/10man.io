@@ -207,7 +207,6 @@
       window.onresize = () => {
         if (window.innerWidth <= 760 && window.innerWidth != this.windowWidth) {
           this.drawer = false
-          console.log('bruh resized')
         }
         this.windowWidth = window.innerWidth
       }
