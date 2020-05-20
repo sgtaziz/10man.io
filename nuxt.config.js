@@ -69,8 +69,9 @@ export default {
 
   oneSignal: {
     init: {
-      appId: process.env.ONE_SIGNAL,
-      allowLocalhostAsSecureOrigin: true
+      appId: process.env.OS_APPID
+      allowLocalhostAsSecureOrigin: true,
+      safari_web_id: process.env.OS_SWEBID,
     },
     notifyButton: {
       enable: true,
