@@ -149,7 +149,7 @@ export default {
         pass: this.password,
         gameType: this.gameType,
         playersPerTeam: this.playersPerTeam,
-        serverLocation: serverLocation
+        serverLocation: this.serverLocation
       })
 
       this.creatingMatch = true
