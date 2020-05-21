@@ -30,11 +30,14 @@
                       <v-col cols="12">
                         <v-text-field v-model="password" label="Password" type="password"></v-text-field>
                       </v-col>
+                      <v-col cols="12">
+                        <v-overflow-btn v-model="serverLocation" :items="['Bristol, UK', 'New York, USA']" persistent-hint hint="Server location" dense></v-overflow-btn>
+                      </v-col>
                       <v-col cols="6">
                         <v-slider v-model="playersPerTeam" thumb-size="24" thumb-label="always" min="1" max="5" label="Team Size" height="70px"></v-slider>
                       </v-col>
                       <v-col cols="6">
-                        <v-overflow-btn v-model="gameType" :items="['csgo', 'valorant']" label="Game Type" dense></v-overflow-btn>
+                        <v-overflow-btn v-model="gameType" :items="['csgo', 'valorant']" persistent-hint hint="Game" dense></v-overflow-btn>
                       </v-col>
                       <v-col cols="12">
                         <v-slider v-model="timeToReady" thumb-size="24" thumb-label="always" min="5" max="60" label="Ready Time Limit"></v-slider>
@@ -110,6 +113,7 @@ export default {
     password: '',
     passwordInput: '',
     gameType: 'csgo',
+    serverLocation: 'Bristol, UK',
     playersPerTeam: 5,
     matches: [],
     matchToJoin: {},
@@ -145,6 +149,7 @@ export default {
         pass: this.password,
         gameType: this.gameType,
         playersPerTeam: this.playersPerTeam,
+        serverLocation: serverLocation
       })
 
       this.creatingMatch = true
