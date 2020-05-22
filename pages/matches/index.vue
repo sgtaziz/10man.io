@@ -49,7 +49,7 @@
                 <v-card-actions>
                   <v-spacer></v-spacer>
                   <v-btn color="primary darken-1" text @click="createMatchDialog = false">Close</v-btn>
-                  <v-btn color="primary darken-1" text @click="createMatch" :disabled="matchName == '' || serverLocation == ''" :loading="creatingMatch">Create</v-btn>
+                  <v-btn color="primary darken-1" text @click="createMatch" :disabled="matchName == '' || (serverLocation == '' && gameType == 'csgo')" :loading="creatingMatch">Create</v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
