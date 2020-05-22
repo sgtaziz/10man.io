@@ -24,14 +24,14 @@
                 <v-card-text>
                   <v-container>
                     <v-row>
-                      <v-col cols="12">
+                      <v-col cols="7">
                         <v-text-field v-model="matchName" label="Match Name *" :rules="[v => !!v || 'Match Name is required']" required></v-text-field>
                       </v-col>
-                      <v-col cols="12">
+                      <v-col cols="5">
                         <v-text-field v-model="password" label="Password" type="password"></v-text-field>
                       </v-col>
-                      <v-col cols="12">
-                        <v-overflow-btn v-model="serverLocation" :items="['Bristol, UK', 'New York, USA']" persistent-hint hint="Server location" dense></v-overflow-btn>
+                      <v-col cols="12" v-if="gameType == 'csgo'">
+                        <v-overflow-btn v-model="serverLocation" :items="availableLocations" persistent-hint hint="Server location *" dense :rules="[v => !!v || 'Location is required']" required></v-overflow-btn>
                       </v-col>
                       <v-col cols="6">
                         <v-slider v-model="playersPerTeam" thumb-size="24" thumb-label="always" min="1" max="5" label="Team Size" height="70px"></v-slider>
@@ -49,7 +49,7 @@
                 <v-card-actions>
                   <v-spacer></v-spacer>
                   <v-btn color="primary darken-1" text @click="createMatchDialog = false">Close</v-btn>
-                  <v-btn color="primary darken-1" text @click="createMatch" :disabled="matchName == ''" :loading="creatingMatch">Create</v-btn>
+                  <v-btn color="primary darken-1" text @click="createMatch" :disabled="matchName == '' || serverLocation == ''" :loading="creatingMatch">Create</v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
@@ -113,7 +113,8 @@ export default {
     password: '',
     passwordInput: '',
     gameType: 'csgo',
-    serverLocation: 'Bristol, UK',
+    serverLocation: '',
+    availableLocations: [],
     playersPerTeam: 5,
     matches: [],
     matchToJoin: {},
@@ -177,11 +178,13 @@ export default {
 
   beforeMount () {
     this.$socket.emit('initPlayer', this.user)
+    this.$socket.emit('getLocations', this.user)
   },
 
   sockets: {
     connect () {
       this.$socket.emit('initPlayer', this.user)
+      this.$socket.emit('getLocations', this.user)
     },
     matchData (data) {
       data = parse(data)
@@ -203,6 +206,9 @@ export default {
     matchJoinFailed () {
       this.joinDisabled = false
       this.passError = true
+    },
+    locationData (data) {
+      this.availableLocations = data
     },
   },
 }

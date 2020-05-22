@@ -1,5 +1,5 @@
 <template>
-  <v-layout v-if="user && user.steamid" style="z-index: 199;">
+  <v-layout v-if="user && user.steamid" style="z-index: 3;">
     <v-flex style="position: fixed; bottom: 0;right: 0;transition: width 0.3s;max-width: 100%;" :style="expanded ? 'width: 420px;' : 'width: 107px;'">
       <v-badge color="red" v-if="notifications > 0" :content="notifications" left offset-y="17.5" offset-x="10" style="z-index: 99"></v-badge>
       <v-card class="elevation-12">
@@ -93,4 +93,7 @@ export default {
 </script>
 
 <style>
+.v-menu__content {
+  box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0, 0, 0, 0.12) !important;
+}
 </style>
