@@ -120,9 +120,10 @@ export default {
     matchToJoin: {},
     timeToReady: 25,
     headers: [
-      { text: 'ID', value: 'id', width: 62 },
+      { text: 'ID', value: 'id', width: 40, sortable: false },
       { text: 'Name', value: 'name' },
-      { text: 'Owner', value: 'owner.steam.personaname', width: 120 },
+      { text: 'Owner', value: 'owner.steam.personaname' },
+      { text: 'Location', value: 'location', width: 187 },
       { text: 'Game', value: 'gameType', width: 90 },
       { text: 'Pass', value: 'password', width: 80 },
       { text: 'Players', value: 'players', width: 95 },
