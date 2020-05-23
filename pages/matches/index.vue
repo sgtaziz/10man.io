@@ -62,6 +62,32 @@
           <template v-slot:item.players="{ item }">
             {{ item.players.length }}/{{ item.playersPerTeam * 2}}
           </template>
+          <template v-slot:item.state="{ item }">
+            <template v-if="item.state == 'queuing'">
+              Waiting on players
+            </template>
+            <template v-else-if="item.state == 'pickPlayers'">
+              Picking teams
+            </template>
+            <template v-else-if="item.state == 'mapVeto'">
+              Vetoing maps
+            </template>
+            <template v-else-if="item.state == 'settingServer'">
+              Spawning server
+            </template>
+            <template v-else-if="item.state == 'joinServer'">
+              Joining server
+            </template>
+            <template v-else-if="item.state == 'knife'">
+              Knifing for sides
+            </template>
+            <template v-else-if="item.state == 'live'">
+              LIVE | {{ item.lastQueueInfo.score1 }} - {{ item.lastQueueInfo.score2 }}
+            </template>
+            <template v-else>
+              Unknown state "{{ item.state }}"
+            </template>
+          </template>
         </v-data-table>
       </v-card>
       <v-dialog v-model="joinMatchDialog" max-width="400px">
@@ -122,13 +148,14 @@ export default {
     headers: [
       { text: 'ID', value: 'id', width: 40, sortable: false },
       { text: 'Name', value: 'name' },
-      { text: 'Owner', value: 'owner.steam.personaname' },
+      { text: 'Status', value: 'state', width: 187 },
+      { text: 'Owner', value: 'owner.steam.personaname', width: 180 },
       { text: 'Location', value: 'location', width: 187 },
       { text: 'Game', value: 'gameType', width: 90 },
       { text: 'Pass', value: 'password', width: 80 },
       { text: 'Players', value: 'players', width: 95 },
     ],
-    player: {},
+    player: { },
   }),
 
   computed: {

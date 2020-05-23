@@ -181,6 +181,8 @@
         })
       },
       ready: function () {
+        this.audio.pause()
+        this.audio.currentTime = 0
         this.$socket.emit(`match-${this.player.match.id}-readyUp`, stringify(this.player))
       },
       getStats: function () {
@@ -213,6 +215,7 @@
 
       this.windowWidth = window.innerWidth
       this.audio = new Audio(process.env.BASE_URL + '/queue.mp3')
+      this.audio.volume = 0.65
       this.$vuetify.theme.dark = this.darkMode
 
       if (this.user.steamid) {
@@ -220,7 +223,7 @@
         this.getStats()
         this.$store.dispatch('queueUp', false)
 
-        this.setExternalID()
+        setTimeout(this.setExternalID, 5000)
       }
     },
 
@@ -240,22 +243,24 @@
         data = parse(data)
         if (data.event == 'queueUp') {
           this.queueData = data
-          if (this.queueData.ready.length == 0) {
-            this.audio.play()
-            this.estimatedTime = this.queueData.expireTime - (new Date()).getTime()
-          }
-          this.$store.dispatch('queueUp', true)
 
-          const loadingInterval = setInterval(() => {
-            const timeDiff = this.queueData.expireTime - new Date().getTime()
-            this.timeLeft = Math.round((timeDiff/this.estimatedTime)*100000)/1000
+          if (this.queueData.ready && (this.queueData.ready.findIndex(x => x.id == this.user.steamid) > -1 || this.queueData.notready.findIndex(x => x.id == this.user.steamid) > -1)) {
+            this.$store.dispatch('queueUp', true)
 
-            if (Math.round(this.timeLeft) == 0) {
-              clearInterval(loadingInterval)
+            if (this.queueData.ready.length == 0) {
+              this.audio.play()
+              this.estimatedTime = this.queueData.expireTime - new Date().getTime()
             }
-          }, 100)
 
+            const loadingInterval = setInterval(() => {
+              const timeDiff = this.queueData.expireTime - new Date().getTime()
+              this.timeLeft = Math.round((timeDiff/this.estimatedTime)*100000)/1000
 
+              if (Math.round(this.timeLeft) == 0) {
+                clearInterval(loadingInterval)
+              }
+            }, 100)
+          }
         } else if (data.event == 'queueExpired') {
           this.queueData = data
           this.$store.dispatch('queueUp', false)
@@ -521,5 +526,9 @@
 
   .rotating {
     animation: rotation 0.5s infinite linear;
+  }
+
+  .container {
+    max-width: 100%;
   }
 </style>
