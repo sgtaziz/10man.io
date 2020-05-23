@@ -194,14 +194,7 @@
         this.$socket.emit('initPlayer', this.user)
       },
       setExternalID: function () {
-        try {
-          this.$OneSignal.push(() => {
-            this.$OneSignal.setExternalUserId(this.user.steamid)
-          })
-        } catch (err) {
-          console.log("Setting external ID failed. Retrying...")
-          this.setExternalID()
-        }
+        this.$OneSignal.push(["setExternalUserId", this.user.steamid])
       }
     },
 
@@ -223,7 +216,7 @@
         this.getStats()
         this.$store.dispatch('queueUp', false)
 
-        setTimeout(this.setExternalID, 5000)
+        setTimeout(this.setExternalID, 1)
       }
     },
 
