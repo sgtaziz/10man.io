@@ -20,7 +20,7 @@ function ConvertToLegacy(inputID) {
   let z = firstPart.div(2).integerValue(BigNumber.ROUND_FLOOR)
   let y = number.mod(2)
 
-  return 'STEAM_0:' + y + ':' + z
+  return 'STEAM_1:' + y + ':' + z
 }
 
 router.get('/players', async function(req, res) {
@@ -46,6 +46,11 @@ router.get('/players', async function(req, res) {
     if (index > -1) {
       players[index].rating = Math.round(res.data.rating * 100)/100 || 0
       players[index].steam32 = ConvertToLegacy(players[index].steamid)
+
+      const oIndex = overview.findIndex(x => x.steam == players[index].steam32)
+      if (oIndex > -1) {
+        players[index].discord = overview[oIndex].discord
+      }
     }
   })
 
