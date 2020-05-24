@@ -12,7 +12,7 @@
         <v-data-table class="text-left" :headers="headers" :items="players" :search="search" :fixed-header="true" @click:row="playerClick" :options="{ sortBy: ['rating'], sortDesc: [true] }">
           <template v-slot:item.image="{ item }">
             <div class="p-2">
-              <v-avatar size="32"><v-img :src="profiles[item.steamid].avatarfull" :alt="item.name"></v-img></v-avatar>
+              <v-avatar size="32"><v-img :src="item.steam_info.avatarfull" :alt="item.name"></v-img></v-avatar>
             </div>
           </template>
         </v-data-table>
@@ -63,45 +63,36 @@ export default {
   async asyncData({ app }) {
     const { data } = await axios.get(process.env.API_DEMOS_ENDPOINT+"players")
 
-    const ids = []
     const players = []
-    let profiles = []
     const promises = []
     const dates = firstLastMonth()
 
     for (let i = 0; i < data.players.length; i++) {
       const player = data.players[i]
 
-      ids.push(player.steamid)
       players.push(player)
       promises.push(axios.get(process.env.API_DEMOS_ENDPOINT+"player/"+player.steamid+"/stats?startDate="+dates[0]+"&endDate="+dates[1]))
     }
 
-    promises.push(axios.get(process.env.API_DEMOS_ENDPOINT+"steamids/info?steamids="+ids.join(',')))
-
     const results = await Promise.all(promises)
 
     results.forEach(res => {
-      if (res.config.url.split('/')[4] == "steamids") {
-        profiles = res.data
-      } else {
-        const index = players.findIndex(x => x.steamid == res.config.url.split('/')[5])
+      const index = players.findIndex(x => x.steamid == res.config.url.split('/')[5])
 
-        if (index > -1) {
-          players[index].rating = Math.round(res.data.rating * 100)/100 || 0
-          players[index].rws = Math.round(res.data.rws/res.data.rounds * 100)/100 || 0
-          players[index].hs = Math.round(res.data.hs_percent * 100)/100 || 0
-          players[index].adr = Math.round(res.data.damage/res.data.rounds * 100)/100 || 0
-          players[index].kdr = Math.round(res.data.kills/res.data.deaths * 100)/100 || 0
-          players[index].won = res.data.won
-          players[index]['3k'] = res.data.rounds_with_kills[3]
-          players[index]['4k'] = res.data.rounds_with_kills[4]
-          players[index]['5k'] = res.data.rounds_with_kills[5]
-        }
+      if (index > -1) {
+        players[index].rating = Math.round(res.data.rating * 100)/100 || 0
+        players[index].rws = Math.round(res.data.rws/res.data.rounds * 100)/100 || 0
+        players[index].hs = Math.round(res.data.hs_percent * 100)/100 || 0
+        players[index].adr = Math.round(res.data.damage/res.data.rounds * 100)/100 || 0
+        players[index].kdr = Math.round(res.data.kills/res.data.deaths * 100)/100 || 0
+        players[index].won = res.data.won
+        players[index]['3k'] = res.data.rounds_with_kills[3]
+        players[index]['4k'] = res.data.rounds_with_kills[4]
+        players[index]['5k'] = res.data.rounds_with_kills[5]
       }
     })
 
-    return { players, profiles }
+    return { players }
   },
 }
 </script>
