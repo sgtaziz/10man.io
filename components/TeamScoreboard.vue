@@ -1,5 +1,5 @@
 <template>
-  <v-data-table :headers="pHeaders" :items="players" item-key="steamid" class="elevation-0" hide-default-footer :options="{ sortBy: ['kills'], sortDesc: [true] }" dense disable-sort  @click:row="playerClick">
+  <v-data-table :headers="pHeaders" :items="players" item-key="steamid" class="elevation-0" hide-default-footer disable-sort dense  @click:row="playerClick">
     <template v-slot:top>
       <v-toolbar flat dense>
         <v-toolbar-title style="width: 100%;">{{ name }}</v-toolbar-title>

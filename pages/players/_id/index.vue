@@ -133,7 +133,7 @@
       </v-row>
     </v-data-iterator>
 
-    <v-data-table :headers="headers" :items="demoStats" item-key="demoid" @click:row="expandRow" show-expand single-expand :expanded.sync="expanded" :options="{ sortBy: ['timestamp'], sortDesc: [true] }" class="elevation-5 text-left" disable-sort>
+    <v-data-table :headers="headers" :items="loading ? [] : demoStats" item-key="demoid" @click:row="expandRow" show-expand single-expand :expanded.sync="expanded" :options="{ sortBy: ['timestamp'], sortDesc: [true] }" class="elevation-5 text-left" :loading="loading">
       <template v-slot:top>
         <v-toolbar flat>
           <v-toolbar-title>Matches</v-toolbar-title>
@@ -141,7 +141,7 @@
         </v-toolbar>
       </template>
       <template v-slot:item.timestamp="{ item }">
-        {{ new Date(item.timestamp * 1000) | moment("calendar") }}
+        {{ new Date(item.timestamp * 1000) | moment("MMMM DD, YYYY H:mm") }}
       </template>
       <template v-slot:item.score="{ item }">
         <v-chip :color="getColor(item)">{{ item.score[0] + '-' + item.score[1] }}</v-chip>
@@ -157,6 +157,15 @@
       </template>
       <template v-slot:item.adr="{ item }">
         {{ Math.round(matchStats[item.demoid].damage/matchStats[item.demoid].rounds*100)/100 }}
+      </template>
+      <template v-slot:item.3k="{ item }">
+        {{ matchStats[item.demoid].rounds_with_kills[3] }}
+      </template>
+      <template v-slot:item.4k="{ item }">
+        {{ matchStats[item.demoid].rounds_with_kills[4] }}
+      </template>
+      <template v-slot:item.5k="{ item }">
+        {{ matchStats[item.demoid].rounds_with_kills[5] }}
       </template>
       <template v-slot:item.demo="{ item }">
         <v-icon @click="downloadDemo(item.demoid)">
@@ -192,17 +201,32 @@ export default {
 
   data: () => ({
     expanded: [],
+    demos: [],
+    demoStats: [],
+    playerTeam: [],
+    matchStats: [],
+    finishedDemos: false,
+    finishedSteam: false,
     headers: [
-      { text: 'Date', value: 'timestamp', width: 200 },
+      { text: 'Date', value: 'timestamp', width: 120 },
       { text: 'Map', value: 'map', width: 95 },
       { text: 'Score', value: 'score' },
-      { text: 'Kills', value: 'kills', width: 35 },
-      { text: 'Deaths', value: 'deaths', width: 35 },
-      { text: 'Assists (FA)', value: 'assists', width: 98 },
-      { text: 'ADR', value: 'adr', width: 70 },
-      { text: 'Demo', value: 'demo', width: 70 },
+      { text: 'K', value: 'kills', width: 60 },
+      { text: 'D', value: 'deaths', width: 60 },
+      { text: 'A (FA)', value: 'assists', width: 85 },
+      { text: 'ADR', value: 'adr', width: 74 },
+      { text: '3k', value: '3k', width: 65 },
+      { text: '4k', value: '4k', width: 65 },
+      { text: '5k', value: '5k', width: 65 },
+      { text: 'Demo', value: 'demo', width: 70, sortable: false },
     ],
   }),
+
+  computed: {
+    loading () {
+      return !(this.finishedDemos && this.finishedSteam)
+    },
+  },
 
   methods: {
     expandRow (row) {
@@ -228,14 +252,75 @@ export default {
     },
   },
 
+  beforeMount () {
+    let promises = []
+    let steamIDs = []
+    let demoIDs = []
+
+    axios.get(process.env.API_DEMOS_ENDPOINT+"player/"+this.$route.params.id+"/demos?offset=0&limit=50").then(res => {
+      this.demos = res.data.demos
+
+      this.demos.forEach(demo => {
+        promises.push(axios.get(process.env.API_DEMOS_ENDPOINT+"demo/"+demo.demoid+"/stats"))
+      })
+
+      Promise.all(promises).then(results => {
+        results.forEach(res => {
+          let demoStat = res.data
+          if (demoIDs.includes(demoStat.demoid)) return
+
+          this.demoStats.push(demoStat)
+          demoIDs.push(demoStat.demoid)
+
+          for (let ii = 0; ii < demoStat.teams['2'].length; ii++) {
+            if (demoStat.teams['2'][ii].steamid == this.user.steamid) {
+              this.matchStats[demoStat.demoid] = demoStat.teams['2'][ii]
+              this.playerTeam[demoStat.demoid] = 2
+            }
+            steamIDs.push(demoStat.teams['2'][ii].steamid)
+          }
+
+          for (let ii = 0; ii < demoStat.teams['3'].length; ii++) {
+            if (demoStat.teams['3'][ii].steamid == this.user.steamid) {
+              this.matchStats[demoStat.demoid] = demoStat.teams['3'][ii]
+              this.playerTeam[demoStat.demoid] = 3
+            }
+            steamIDs.push(demoStat.teams['3'][ii].steamid)
+          }
+
+          demoStat.teams['2'].sort((a, b) => (a.rating > b.rating) ? -1 : 1)
+          demoStat.teams['3'].sort((a, b) => (a.rating > b.rating) ? -1 : 1)
+        })
+
+        this.finishedDemos = true
+        this.demoStats.sort((a, b) => (a.timestmap > b.timestmap) ? -1 : 1)
+
+        const distinctSteamIDs = [...new Set(steamIDs)]
+
+        for (let i = 0; i < distinctSteamIDs.length; i++) {
+          let steamid = distinctSteamIDs[i]
+          if (this.profiles[steamid]) {
+            distinctSteamIDs.splice(i, 1)
+          }
+        }
+
+        axios.get(process.env.API_DEMOS_ENDPOINT+"steamids/info?steamids="+distinctSteamIDs.join(',')).then(res => {
+          this.profiles = { ...this.profiles, ...res.data }
+          this.finishedSteam = true
+        })
+      })
+    })
+  },
+
   async asyncData({ params, error }) {
     let steamIDs = []
-    let promises = []
     let profiles = {}
     let user = {}
+    const dates = firstLastMonth()
 
-    let { data } = await axios.get(process.env.API_DEMOS_ENDPOINT+"player/"+params.id+"/stats")
+    let { data } = await axios.get(process.env.API_DEMOS_ENDPOINT+"player/"+params.id+"/stats?startDate="+dates[0]+"&endDate="+dates[1])
     let stats = data
+
     let statItems = [
       {
         win: Math.round(stats.won/(stats.won+stats.lost) * 100 * 100)/100,
@@ -272,56 +357,7 @@ export default {
     user = res.data[params.id]
     if (!user.personaname) return error({ statusCode: 404, message: 'Player not found' })
 
-    res = await axios.get(process.env.API_DEMOS_ENDPOINT+"player/"+params.id+"/demos?offset=0")
-    let demos = res.data.demos
-
-    for (let i = 0; i < demos.length; i++) {
-      promises.push(axios.get(process.env.API_DEMOS_ENDPOINT+"demo/"+demos[i].demoid+"/stats"))
-    }
-
-    const demoStats = []
-    const playerTeam = []
-    const matchStats = []
-
-    const results = await Promise.all(promises)
-    results.forEach(res => {
-      let demoStat = res.data
-      demoStats.push(demoStat)
-
-      for (let ii = 0; ii < demoStat.teams['2'].length; ii++) {
-        if (demoStat.teams['2'][ii].steamid == user.steamid) {
-          matchStats[demoStat.demoid] = demoStat.teams['2'][ii]
-          playerTeam[demoStat.demoid] = 2
-        }
-        steamIDs.push(demoStat.teams['2'][ii].steamid)
-      }
-
-      for (let ii = 0; ii < demoStat.teams['3'].length; ii++) {
-        if (demoStat.teams['3'][ii].steamid == user.steamid) {
-          matchStats[demoStat.demoid] = demoStat.teams['3'][ii]
-          playerTeam[demoStat.demoid] = 3
-        }
-        steamIDs.push(demoStat.teams['3'][ii].steamid)
-      }
-
-      demoStat.teams['2'].sort((a, b) => (a.kills > b.kills) ? -1 : 1)
-      demoStat.teams['3'].sort((a, b) => (a.kills > b.kills) ? -1 : 1)
-    })
-
-    demoStats.sort((a, b) => (a.timestmap > b.timestmap) ? -1 : 1)
-    const distinctSteamIDs = [...new Set(steamIDs)]
-
-    for (let i = 0; i < distinctSteamIDs.length; i++) {
-      let steamid = distinctSteamIDs[i]
-      if (profiles[steamid]) {
-        distinctSteamIDs.splice(i, 1)
-      }
-    }
-
-    res = await axios.get(process.env.API_DEMOS_ENDPOINT+"steamids/info?steamids="+distinctSteamIDs.join(','))
-    profiles = { ...profiles, ...res.data }
-
-    return { profiles, user, stats, statItems, demos, demoStats, matchStats, playerTeam }
+    return { profiles, user, stats, statItems }
   },
 }
 </script>

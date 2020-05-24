@@ -156,14 +156,17 @@
           this.$vuetify.theme.dark = val
         }
       },
+      totalGames () {
+        return this.stats.lost + this.stats.won + this.stats.tied
+      },
       items () {
         return [
           { title: 'Home', icon: 'mdi-home', to: '/' },
-          { title: 'Profile', icon: 'mdi-account', to: '/players/'+this.user.steamid, tooltip: 'Rating: ' + Math.round(this.stats.rating*100)/100 },
+          { title: 'Profile', icon: 'mdi-account', to: '/players/'+this.user.steamid, tooltip: 'Rating: ' + (this.totalGames >= 3 ? (Math.round(this.stats.rating*100)/100) : 'N/A')},
           { title: 'Players', icon: 'mdi-format-list-numbered', to: '/players' },
           { title: 'Matches', icon: 'mdi-play', to: '/matches' },
         ]
-      }
+      },
     },
 
     methods: {
@@ -186,7 +189,9 @@
         this.$socket.emit(`match-${this.player.match.id}-readyUp`, stringify(this.player))
       },
       getStats: function () {
-        axios.get(process.env.API_DEMOS_ENDPOINT+"player/"+this.user.steamid+"/stats").then(res => {
+        const dates = firstLastMonth()
+
+        axios.get(process.env.API_DEMOS_ENDPOINT+"player/"+this.user.steamid+"/stats?startDate="+dates[0]+"&endDate="+dates[1]).then(res => {
           this.stats = res.data
         })
       },

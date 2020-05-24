@@ -22,7 +22,6 @@
 </template>
 
 <script>
-// @ is an alias to /src
 import axios from 'axios'
 import BigNumber from "bignumber.js"
 
@@ -41,11 +40,13 @@ export default {
       { text: 'Name', value: 'name' },
       { text: 'Rating', value: 'rating', width: 85 },
       { text: 'RWS', value: 'rws', width: 80 },
-      { text: 'Score', value: 'score', width: 85 },
       { text: 'ADR', value: 'adr', width: 80 },
       { text: 'KDR', value: 'kdr', width: 80 },
       { text: 'HS%', value: 'hs', width: 80 },
       { text: 'Wins', value: 'won', width: 80 },
+      { text: '3k', value: '3k', width: 65 },
+      { text: '4k', value: '4k', width: 65 },
+      { text: '5k', value: '5k', width: 65 },
     ],
   }),
 
@@ -60,22 +61,20 @@ export default {
   },
 
   async asyncData({ app }) {
-    const { data } = await axios.get(process.env.API_ENDPOINT+"overview")
+    const { data } = await axios.get(process.env.API_DEMOS_ENDPOINT+"players")
 
     const ids = []
     const players = []
     let profiles = []
     const promises = []
+    const dates = firstLastMonth()
 
-    for (let i = 0; i < data.length; i++) {
-      const player = data[i]
-      const steamidParts = player.steam.split(':')
+    for (let i = 0; i < data.players.length; i++) {
+      const player = data.players[i]
 
-      player.steamid = (new BigNumber(steamidParts[2])).times(2).plus(new BigNumber('76561197960265728')).plus(new BigNumber(steamidParts[1])).toString()
       ids.push(player.steamid)
-
-      promises.push(axios.get(process.env.API_DEMOS_ENDPOINT+"player/"+player.steamid+"/stats"))
       players.push(player)
+      promises.push(axios.get(process.env.API_DEMOS_ENDPOINT+"player/"+player.steamid+"/stats?startDate="+dates[0]+"&endDate="+dates[1]))
     }
 
     promises.push(axios.get(process.env.API_DEMOS_ENDPOINT+"steamids/info?steamids="+ids.join(',')))
@@ -95,10 +94,13 @@ export default {
           players[index].adr = Math.round(res.data.damage/res.data.rounds * 100)/100 || 0
           players[index].kdr = Math.round(res.data.kills/res.data.deaths * 100)/100 || 0
           players[index].won = res.data.won
+          players[index]['3k'] = res.data.rounds_with_kills[3]
+          players[index]['4k'] = res.data.rounds_with_kills[4]
+          players[index]['5k'] = res.data.rounds_with_kills[5]
         }
       }
     })
-    console.log(profiles)
+
     return { players, profiles }
   },
 }

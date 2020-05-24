@@ -48,7 +48,7 @@ export default {
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: ['~/plugins/chatscroll.js', '~/plugins/moment.js', '~/plugins/socket.client.js', '~/plugins/timeago.js'],
+  plugins: ['~/plugins/chatscroll.js', '~/plugins/moment.js', '~/plugins/socket.client.js', '~/plugins/timeago.js', '~/plugins/mixins.js'],
   /*
    ** Nuxt.js dev-modules
    */

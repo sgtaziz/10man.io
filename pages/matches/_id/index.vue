@@ -32,7 +32,7 @@
                 <v-list-item-title class="text-left">
                   {{ player.steam.personaname }}
                   <span v-if="stats[player.id]" class="float-right overline">
-                    Rating: {{ Math.round(stats[player.id].rating * 100)/100 }}
+                    Rating: {{ (stats[player.id].won + stats[player.id].lost + stats[player.id].tied) >= 3 ? Math.round(stats[player.id].rating * 100)/100 : 'N/A' }}
                   </span>
                 </v-list-item-title>
               </v-list-item-content>
@@ -79,7 +79,7 @@
                 <v-list-item-title class="text-left">
                   {{ player.steam.personaname }}
                   <span v-if="stats[player.id]" class="float-right overline">
-                    Rating: {{ Math.round(stats[player.id].rating * 100)/100 }}
+                    Rating: {{ (stats[player.id].won + stats[player.id].lost + stats[player.id].tied) >= 3 ? Math.round(stats[player.id].rating * 100)/100 : 'N/A' }}
                   </span>
                 </v-list-item-title>
               </v-list-item-content>
@@ -145,7 +145,7 @@
                 <v-list-item-title class="text-left">
                   {{ player.steam.personaname }}
                   <span v-if="stats[player.id]" class="float-right overline">
-                    Rating: {{ Math.round(stats[player.id].rating * 100)/100 }}
+                    Rating: {{ (stats[player.id].won + stats[player.id].lost + stats[player.id].tied) >= 3 ? Math.round(stats[player.id].rating * 100)/100 : 'N/A' }}
                   </span>
                 </v-list-item-title>
               </v-list-item-content>
@@ -236,9 +236,11 @@ export default {
         return
       }
 
+      const dates = firstLastMonth()
+
       this.queue.forEach((player) => {
         if (!this.stats[player.id]) {
-          axios.get(process.env.API_DEMOS_ENDPOINT+"player/"+player.id+"/stats").then(res => {
+          axios.get(process.env.API_DEMOS_ENDPOINT+"player/"+player.id+"/stats?startDate="+dates[0]+"&endDate="+dates[1]).then(res => {
             this.stats[player.id] = res.data
             this.stats.push()
           })
@@ -252,9 +254,11 @@ export default {
       data = parse(data)
       this.team1 = data
 
+      const dates = firstLastMonth()
+
       this.team1.forEach((player) => {
         if (!this.stats[player.id]) {
-          axios.get(process.env.API_DEMOS_ENDPOINT+"player/"+player.id+"/stats").then(res => {
+          axios.get(process.env.API_DEMOS_ENDPOINT+"player/"+player.id+"/stats?startDate="+dates[0]+"&endDate="+dates[1]).then(res => {
             this.stats[player.id] = res.data
             this.stats.push()
           })
