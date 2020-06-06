@@ -23,16 +23,16 @@
           <v-divider></v-divider>
 
           <v-list dense>
-            <v-list-item v-for="player in team1" :key="player.id">
+            <v-list-item v-for="p in team1" :key="p.id">
               <v-list-item-avatar size="28" style="margin-right: 10px;">
-                <v-img :src="player.steam.avatarfull"></v-img>
+                <v-img :src="p.steam.avatarfull"></v-img>
               </v-list-item-avatar>
 
               <v-list-item-content>
                 <v-list-item-title class="text-left">
-                  {{ player.steam.personaname }}
-                  <span v-if="stats[player.id]" class="float-right overline">
-                    Rating: {{ (stats[player.id].won + stats[player.id].lost + stats[player.id].tied) >= 3 ? Math.round(stats[player.id].rating * 100)/100 : 'N/A' }}
+                  {{ p.steam.personaname }}
+                  <span v-if="stats[p.id]" class="float-right overline">
+                    Rating: {{ (stats[p.id].won + stats[p.id].lost + stats[p.id].tied) >= 3 ? Math.round(stats[p.id].rating * 100)/100 : 'N/A' }}
                   </span>
                 </v-list-item-title>
               </v-list-item-content>
@@ -70,16 +70,16 @@
           <v-divider></v-divider>
 
           <v-list v-if="queueInfo.event != 'mapVeto' && queueInfo.event != 'settingServer' && queueInfo.event != 'joinServer' && queueInfo.event != 'live'" dense>
-            <v-list-item v-for="player in players" :key="player.id" @click="addTeam(player)" :inactive="queueInfo.event != 'pickPlayers' || capts['c'+queueInfo.order[pickPos]].id != player.id">
+            <v-list-item v-for="p in players" :key="p.id" @click="addTeam(player)" :disabled="queueInfo.event != 'pickPlayers' || capts['c'+queueInfo.order[pickPos]].id != player.id">
               <v-list-item-avatar size="28" style="margin-right: 10px;">
-                <v-img :src="player.steam.avatarfull"></v-img>
+                <v-img :src="p.steam.avatarfull"></v-img>
               </v-list-item-avatar>
 
               <v-list-item-content>
                 <v-list-item-title class="text-left">
-                  {{ player.steam.personaname }}
-                  <span v-if="stats[player.id]" class="float-right overline">
-                    Rating: {{ (stats[player.id].won + stats[player.id].lost + stats[player.id].tied) >= 3 ? Math.round(stats[player.id].rating * 100)/100 : 'N/A' }}
+                  {{ p.steam.personaname }}
+                  <span v-if="stats[p.id]" class="float-right overline">
+                    Rating: {{ (stats[p.id].won + stats[p.id].lost + stats[p.id].tied) >= 3 ? Math.round(stats[player.id].rating * 100)/100 : 'N/A' }}
                   </span>
                 </v-list-item-title>
               </v-list-item-content>
@@ -90,7 +90,7 @@
             </v-list-item>
           </v-list>
           <v-list v-else-if="queueInfo.event == 'mapVeto'" dense>
-            <v-list-item v-for="map in queueInfo.maps" :key="map" @click="vetoMap(map)" :inactive="capts['c'+queueInfo.turn].id != player.id">
+            <v-list-item v-for="map in queueInfo.maps" :key="map" @click="vetoMap(map)" :disabled="capts['c'+queueInfo.turn].id != player.id">
               <v-list-item-content>
                 <v-list-item-title class="text-left" v-text="map"></v-list-item-title>
               </v-list-item-content>
@@ -136,16 +136,16 @@
           <v-divider></v-divider>
 
           <v-list dense>
-            <v-list-item v-for="player in team2" :key="player.id">
+            <v-list-item v-for="p in team2" :key="p.id">
               <v-list-item-avatar size="28" style="margin-right: 10px;">
-                <v-img :src="player.steam.avatarfull"></v-img>
+                <v-img :src="p.steam.avatarfull"></v-img>
               </v-list-item-avatar>
 
               <v-list-item-content>
                 <v-list-item-title class="text-left">
-                  {{ player.steam.personaname }}
-                  <span v-if="stats[player.id]" class="float-right overline">
-                    Rating: {{ (stats[player.id].won + stats[player.id].lost + stats[player.id].tied) >= 3 ? Math.round(stats[player.id].rating * 100)/100 : 'N/A' }}
+                  {{ p.steam.personaname }}
+                  <span v-if="stats[p.id]" class="float-right overline">
+                    Rating: {{ (stats[p.id].won + stats[p.id].lost + stats[p.id].tied) >= 3 ? Math.round(stats[p.id].rating * 100)/100 : 'N/A' }}
                   </span>
                 </v-list-item-title>
               </v-list-item-content>
