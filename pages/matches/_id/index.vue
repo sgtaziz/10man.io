@@ -79,7 +79,7 @@
                 <v-list-item-title class="text-left">
                   {{ p.steam.personaname }}
                   <span v-if="stats[p.id]" class="float-right overline">
-                    Rating: {{ (stats[p.id].won + stats[p.id].lost + stats[p.id].tied) >= 3 ? Math.round(stats[player.id].rating * 100)/100 : 'N/A' }}
+                    Rating: {{ (stats[p.id].won + stats[p.id].lost + stats[p.id].tied) >= 3 ? Math.round(stats[p.id].rating * 100)/100 : 'N/A' }}
                   </span>
                 </v-list-item-title>
               </v-list-item-content>
