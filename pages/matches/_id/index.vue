@@ -70,7 +70,7 @@
           <v-divider></v-divider>
 
           <v-list v-if="queueInfo.event != 'mapVeto' && queueInfo.event != 'settingServer' && queueInfo.event != 'joinServer' && queueInfo.event != 'live'" dense>
-            <v-list-item v-for="p in players" :key="p.id" @click="addTeam(player)" :disabled="queueInfo.event != 'pickPlayers' || capts['c'+queueInfo.order[pickPos]].id != player.id">
+            <v-list-item v-for="p in players" :key="p.id" @click="addTeam(p)" :disabled="queueInfo.event != 'pickPlayers' || capts['c'+queueInfo.order[pickPos]].id != player.id">
               <v-list-item-avatar size="28" style="margin-right: 10px;">
                 <v-img :src="p.steam.avatarfull"></v-img>
               </v-list-item-avatar>
