@@ -18,7 +18,7 @@
     "@nuxtjs/pwa": "^3.0.0-0",
     "bignumber.js": "^9.0.0",
     "connect-redis": "^4.0.4",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "express-session": "^1.17.1",
     "flatted": "^2.0.2",
     "nuxt": "^2.0.0",
